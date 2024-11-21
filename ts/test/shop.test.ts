@@ -1,12 +1,18 @@
+// Import des dépendances nécessaires
 import { test, expect } from "@jest/globals"
 
 import Address from '../address'
 import Shop from '../shop'
 import User from '../user'
 
+// Définition des adresses de test
 const fsfAddress = new Address("51 Franklin Street", "Fifth Floor", "Boston", "02110", "USA")
 const parisAddress = new Address("33 quai d'Orsay", "", "Paris", "75007", "France")
 
+/**
+ * Classe Builder pour faciliter la création d'instances User dans les tests
+ * Utilise le pattern Builder pour une construction fluide des objets User
+ */
 class UserBuilder {
   private name: string = "Default Name";
   private email: string = "default@email.com";
@@ -14,6 +20,7 @@ class UserBuilder {
   private verified: boolean = true;
   private address: Address = new Address("", "", "", "", "USA");
 
+  // Méthodes de configuration des propriétés
   withName(name: string): UserBuilder {
     this.name = name;
     return this;
@@ -39,6 +46,7 @@ class UserBuilder {
     return this;
   }
 
+  // Création de l'instance User finale
   build(): User {
     return new User({
       name: this.name,
@@ -50,6 +58,7 @@ class UserBuilder {
   }
 }
 
+// Test du cas nominal avec un utilisateur valide des USA
 test('happy path', () => {
   const user = new UserBuilder()
     .withName("Bob")
@@ -63,6 +72,7 @@ test('happy path', () => {
   expect(Shop.mustPayForeignFee(user)).toBe(false)
 })
 
+// Test de la restriction d'âge
 test('minor users cannot order from the shop', () => {
   const user = new UserBuilder()
     .withName("Bob")
@@ -75,6 +85,7 @@ test('minor users cannot order from the shop', () => {
   expect(Shop.canOrder(user)).toBe(false)
 })
 
+// Test de la vérification du compte utilisateur
 test('must be a verified user to order from the shop', () => {
   const user = new UserBuilder()
     .withAge(25)
@@ -84,6 +95,7 @@ test('must be a verified user to order from the shop', () => {
   expect(Shop.canOrder(user)).toBe(false);
 })
 
+// Test des frais supplémentaires pour les commandes internationales
 test('foreigners must pay foreign fee', () => {
   const user = new UserBuilder()
     .withAge(25)
@@ -94,6 +106,7 @@ test('foreigners must pay foreign fee', () => {
   expect(Shop.mustPayForeignFee(user)).toBe(true)
 })
 
+// Test du cas d'erreur avec des champs obligatoires manquants
 test('sad path', () => {
   const user = new UserBuilder()
     .withAge(19)
