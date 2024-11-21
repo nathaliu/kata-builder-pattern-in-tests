@@ -18,31 +18,31 @@ class UserBuilder {
   private email: string = "bob@domain.tld";
   private age: number = 18;
   private verified: boolean = true;
-  private address: Address = new Address("", "", "", "", "USA");
+  private address: Address = fsfAddress;
 
   // Méthodes de configuration des propriétés
   withName(name: string): UserBuilder {
     this.name = name;
     return this;
-  }!
+  }
 
   withEmail(email: string): UserBuilder {
     this.email = email;
     return this;
   }
 
-  withAge(age: number): UserBuilder {
-    this.age = age;
+  minor(): UserBuilder {
+    this.age = 16;
     return this;
   }
 
-  withVerificationStatus(verified: boolean): UserBuilder {
-    this.verified = verified;
+  unverified(): UserBuilder {
+    this.verified = false;
     return this;
   }
 
-  withAddress(address: Address): UserBuilder {
-    this.address = address;
+  foreigner(): UserBuilder {
+    this.address = parisAddress;
     return this;
   }
 
@@ -69,7 +69,7 @@ test('happy path', () => {
 // Test de la restriction d'âge
 test('minor users cannot order from the shop', () => {
   const user = new UserBuilder()
-    .withAge(16)
+    .minor()
     .build();
 
   expect(Shop.canOrder(user)).toBe(false)
@@ -78,7 +78,7 @@ test('minor users cannot order from the shop', () => {
 // Test de la vérification du compte utilisateur
 test('must be a verified user to order from the shop', () => {
   const user = new UserBuilder()
-    .withVerificationStatus(false)
+    .unverified()
     .build();
 
   expect(Shop.canOrder(user)).toBe(false);
@@ -87,19 +87,9 @@ test('must be a verified user to order from the shop', () => {
 // Test des frais supplémentaires pour les commandes internationales
 test('foreigners must pay foreign fee', () => {
   const user = new UserBuilder()
-    .withAddress(parisAddress)
+    .foreigner()
     .build();
 
   expect(Shop.mustPayForeignFee(user)).toBe(true)
 })
 
-// Test du cas d'erreur avec des champs obligatoires manquants
-test('sad path', () => {
-  const user = new UserBuilder()
-    .withAge(16)
-    .withVerificationStatus(false)
-    .withAddress(parisAddress)
-    .build();
-
-  expect(Shop.canOrder(user)).toBe(false)
-})
