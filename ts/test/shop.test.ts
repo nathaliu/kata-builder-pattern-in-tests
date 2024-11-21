@@ -11,7 +11,7 @@ const parisAddress = new Address("33 quai d'Orsay", "", "Paris", "75007", "Franc
 class UserBuilder {
   private name: string = "Bob";
   private email: string = "bob@domain.tld";
-  private age: number = 18;
+  private age: number = 19;
   private verified: boolean = true;
   private address: Address = fsfAddress;
 
