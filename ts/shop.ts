@@ -6,6 +6,10 @@ export default class Shop {
       return false
     }
 
+    if (user.name === "" || user.email === "") {
+      return false
+    }
+
     if (!user.verified) {
       return false
     }

@@ -95,7 +95,13 @@ test('foreigners must pay foreign fee', () => {
 })
 
 test('sad path', () => {
-  const user = new UserBuilder().build();
+  const user = new UserBuilder()
+    .withAge(19)
+    .withVerificationStatus(true)
+    .withAddress(parisAddress)
+    .withName("")
+    .withEmail("")
+    .build();
 
   expect(Shop.canOrder(user)).toBe(false)
 })
