@@ -8,16 +8,16 @@ const fsfAddress = new Address("51 Franklin Street", "Fifth Floor", "Boston", "0
 const parisAddress = new Address("33 quai d'Orsay", "", "Paris", "75007", "France")
 
 class UserBuilder {
-  private name: string = "Default Name";
-  private email: string = "default@email.com";
-  private age: number = 25;
+  private name: string = "Bob";
+  private email: string = "bob@domain.tld";
+  private age: number = 18;
   private verified: boolean = true;
   private address: Address = new Address("", "", "", "", "USA");
 
   withName(name: string): UserBuilder {
     this.name = name;
     return this;
-  }
+  }!
 
   withEmail(email: string): UserBuilder {
     this.email = email;
@@ -51,13 +51,7 @@ class UserBuilder {
 }
 
 test('happy path', () => {
-  const user = new UserBuilder()
-    .withName("Bob")
-    .withEmail("bob@domain.tld")
-    .withAge(25)
-    .withVerificationStatus(true)
-    .withAddress(fsfAddress)
-    .build();
+  const user = new UserBuilder().build();
 
   expect(Shop.canOrder(user)).toBe(true)
   expect(Shop.mustPayForeignFee(user)).toBe(false)
@@ -65,11 +59,7 @@ test('happy path', () => {
 
 test('minor users cannot order from the shop', () => {
   const user = new UserBuilder()
-    .withName("Bob")
-    .withEmail("bob@domain.tld")
     .withAge(16)
-    .withAddress(fsfAddress)
-    .withVerificationStatus(true)
     .build();
 
   expect(Shop.canOrder(user)).toBe(false)
@@ -77,7 +67,6 @@ test('minor users cannot order from the shop', () => {
 
 test('must be a verified user to order from the shop', () => {
   const user = new UserBuilder()
-    .withAge(25)
     .withVerificationStatus(false)
     .build();
 
@@ -86,9 +75,7 @@ test('must be a verified user to order from the shop', () => {
 
 test('foreigners must pay foreign fee', () => {
   const user = new UserBuilder()
-    .withAge(25)
     .withAddress(parisAddress)
-    .withVerificationStatus(true)
     .build();
 
   expect(Shop.mustPayForeignFee(user)).toBe(true)
@@ -96,11 +83,9 @@ test('foreigners must pay foreign fee', () => {
 
 test('sad path', () => {
   const user = new UserBuilder()
-    .withAge(19)
-    .withVerificationStatus(true)
+    .withAge(16)
+    .withVerificationStatus(false)
     .withAddress(parisAddress)
-    .withName("")
-    .withEmail("")
     .build();
 
   expect(Shop.canOrder(user)).toBe(false)
